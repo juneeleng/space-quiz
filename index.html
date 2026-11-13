@@ -396,7 +396,7 @@
       </div>
       <div class="question-area" id="questionArea" aria-live="polite"></div>
       <footer class="card-footer">
-        <span class="hint">✨ Pick your best answer</span>
+        <span class="hint">✨ Pick an answer (1–4 or A–D)</span>
         <button class="next-button" id="nextButton" type="button">Next question →</button>
       </footer>
     </section>
@@ -506,14 +506,38 @@
       renderQuestion();
     }
 
-    nextButton.addEventListener("click", () => {
-      if (!answered) return;
+    function advance() {
+      if (!answered || nextButton.disabled) return;
       if (current < questions.length - 1) {
         current++;
         renderQuestion();
       } else {
         showResults();
       }
+    }
+
+    nextButton.addEventListener("click", advance);
+
+    document.addEventListener("keydown", event => {
+      const key = event.key.toLowerCase();
+      if (!answered) {
+        const answerIndex = /^[1-4]$/.test(key)
+          ? Number(key) - 1
+          : /^[a-d]$/.test(key) ? key.charCodeAt(0) - 97 : -1;
+        const answerButton = questionArea.querySelectorAll(".answer")[answerIndex];
+        if (answerButton) {
+          event.preventDefault();
+          answerButton.click();
+        }
+        return;
+      }
+
+      if (event.key !== "Enter" || nextButton.disabled) return;
+      if (event.target instanceof Element && event.target.closest(
+        "button:enabled, a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [contenteditable='true']"
+      )) return;
+      event.preventDefault();
+      advance();
     });
 
     const themeToggle = document.getElementById("themeToggle");
