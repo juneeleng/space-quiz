@@ -517,14 +517,21 @@
     });
 
     const themeToggle = document.getElementById("themeToggle");
-    themeToggle.addEventListener("click", () => {
-      const dark = document.documentElement.dataset.theme !== "dark";
+    function setTheme(theme) {
+      const dark = theme === "dark";
       document.documentElement.dataset.theme = dark ? "dark" : "light";
       document.getElementById("themeIcon").textContent = dark ? "☀️" : "🌙";
       document.getElementById("themeLabel").textContent = dark ? "Light mode" : "Dark mode";
       themeToggle.setAttribute("aria-label", `Switch to ${dark ? "light" : "dark"} theme`);
+    }
+
+    themeToggle.addEventListener("click", () => {
+      const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      localStorage.setItem("theme", theme);
+      setTheme(theme);
     });
 
+    setTheme(localStorage.getItem("theme") === "dark" ? "dark" : "light");
     renderQuestion();
   </script>
 </body>
